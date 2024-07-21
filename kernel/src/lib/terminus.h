@@ -7,6 +7,7 @@ struct font {
     uint8_t data[];
 };
 
+__attribute__((unused))
 static struct font font = {
     "Terminus 8x16",
     8, 16,

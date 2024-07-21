@@ -35,7 +35,6 @@ override CFLAGS += \
 override CPPFLAGS += \
 	-Isrc \
 	-Iprintf/src/ \
-	-Iflanterm \
 	-Ifreestanding-headers \
 	-DPRINTF_SUPPORT_DECIMAL_SPECIFIERS=0 \
 	-DPRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS=0 \
@@ -56,8 +55,6 @@ override ASFILES := $(shell cd src && find -L * -type f -name '*.S')
 
 # we have a few extra files that are not part of the source code itself.
 override CFILES += \
-	flanterm/flanterm.c \
-	flanterm/backends/fb.c \
 	printf/src/printf/printf.c
 
 override OBJECTS := $(addprefix obj/,$(CFILES:.c=.c.o) $(ASFILES:.S=.S.o))
@@ -87,14 +84,6 @@ obj/%.S.o: src/%.S
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # why do i have to do this maually
-obj/flanterm/flanterm.c.o: flanterm/flanterm.c
-	mkdir -p "$$(dirname $@)"
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
-obj/flanterm/backends/fb.c.o: flanterm/backends/fb.c
-	mkdir -p "$$(dirname $@)"
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
 obj/printf/src/printf/printf.c.o: printf/src/printf/printf.c
 	mkdir -p "$$(dirname $@)"
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

@@ -1,8 +1,6 @@
 #include <sys/cpu.h>
 #include <limine.h>
 #include <lib/term.h>
-#include <flanterm.h>
-#include <backends/fb.h>
 #include <lib/terminus.h>
 
 __attribute__((section(".requests"), used))
@@ -11,38 +9,88 @@ static volatile struct limine_framebuffer_request framebuffer_request = {
     .revision = 0,
 };
 
-static struct flanterm_context *context = NULL;
 // TODO: locking
 
-// flanterm uses a gray foreground color by default. We want to set it to white
-static uint32_t fg_col = 0xFFFFFF;
+struct terminfo {
+    uint32_t *fb;
+    uint8_t *font;
+    uint8_t font_width, font_height;
 
-void term_init(void)
-{
+    size_t width, height;
+    size_t columns, rows;
+    struct {
+        size_t x, y;
+    } cursor;
+
+    uint32_t bg_col, fg_col;
+};
+
+static uint32_t fg_col = 0xFFFFFF;
+static struct terminfo terminfo;
+static struct limine_framebuffer *fb = NULL;
+
+void term_init(void) {
     if (framebuffer_request.response == NULL
         || framebuffer_request.response->framebuffer_count == 0) {
             halt();
     }
-    struct limine_framebuffer *fb =
+    fb =
         framebuffer_request.response->framebuffers[0];
 
-    context = flanterm_fb_init(NULL, NULL,
-        fb->address,
-        fb->width, fb->height,
-        fb->pitch,
-        fb->red_mask_size, fb->red_mask_shift,
-        fb->green_mask_size, fb->green_mask_shift,
-        fb->blue_mask_size, fb->blue_mask_shift,
-        NULL, NULL, NULL,
-        NULL, &fg_col, NULL, NULL,
-        font.data, font.width, font.height, 0, 1, 1, 0);
 
-    if (context == NULL) {
-        halt();
+    terminfo = (struct terminfo) {
+        .fb = fb->address,
+        .font = font.data,
+        .font_width = font.width,
+        .font_height = font.height,
+        .width = fb->width,
+        .height = fb->height,
+        .columns = fb->width / font.width,
+        .rows = fb->height / font.height,
+        .cursor = {
+            .x = 0,
+            .y = 0,
+        },
+        .bg_col = 0x000000,
+        .fg_col = fg_col
+    };
+}
+
+static void draw_char(uint32_t x, uint32_t y, char c) {
+    uint8_t *glyph = &terminfo.font[(uint8_t)c * terminfo.font_height];
+    for (uint16_t row = 0; row < terminfo.font_height; ++row) {
+        uint8_t row_data = glyph[row];
+        for (uint16_t col = 0; col < terminfo.font_width; ++col) {
+            uint32_t pixelx = x + col;
+            uint32_t pixely = y + row;
+            if (row_data & (1 << (7 - col))) {
+                terminfo.fb[pixely * (fb->pitch / (fb->bpp / 8)) + pixelx] = terminfo.fg_col;
+            } else {
+                terminfo.fb[pixely * (fb->pitch / (fb->bpp / 8)) + pixelx] = terminfo.bg_col;
+            }
+        }
     }
 }
 
-void term_write(const char *str, size_t length)
-{
-    flanterm_write(context, str, length);
+void term_write(const char *str) {
+    while (*str) {
+        if (*str == '\n') {
+            terminfo.cursor.x = 0;
+            terminfo.cursor.y += terminfo.font_height;
+            if (terminfo.cursor.y >= terminfo.height) {
+                terminfo.cursor.y = 0;
+            }
+        } else {
+            draw_char(terminfo.cursor.x, terminfo.cursor.y, *str);
+            terminfo.cursor.x += terminfo.font_width;
+            if (terminfo.cursor.x > terminfo.width) {
+                terminfo.cursor.x = 0;
+                terminfo.cursor.y += terminfo.font_height;
+                if (terminfo.cursor.y >= terminfo.height) {
+                    terminfo.cursor.y = 0;
+                }
+            }
+        }
+        str++;
+    }
 }

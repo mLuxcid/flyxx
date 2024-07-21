@@ -23,7 +23,7 @@ int vprintf(const char *restrict format, va_list args)
 {
     char buf[2048];
     int ret = vsnprintf(buf, sizeof(buf), format, args);
-    term_write(buf, strlen(buf));
+    term_write(buf);
 
     return ret;
 }

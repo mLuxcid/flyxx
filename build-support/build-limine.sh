@@ -2,7 +2,7 @@
 
 set -xe
 
-[ -d "limine "] && exit
+[ -d "limine" ] && exit
 git clone https://github.com/limine-bootloader/limine
 
 cd limine
