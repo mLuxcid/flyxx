@@ -3,4 +3,4 @@
 **/obj
 **/compile_flags.txt
 limine/
-**/**/limine.h
+kernel/src/limine.h
