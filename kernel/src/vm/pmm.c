@@ -22,8 +22,7 @@ struct pmm_block {
 };
 static struct pmm_block *head;
 
-void vm_phys_init(void)
-{
+void vm_phys_init(void) {
     struct limine_memmap_entry **entries = memmap_request.response->entries;
     struct pmm_block *prev = NULL;
     uintptr_t first_usable = 0;
@@ -75,8 +74,7 @@ void vm_phys_init(void)
     printf("got a total of %zu free pages (%zu KiB).\n", count, count * 4096 / 1024);
 }
 
-void *vm_phys_alloc_page(void)
-{
+void *vm_phys_alloc_page(void) {
     if (head != NULL) {
         struct pmm_block *node = head;
         head = head->next;
@@ -86,8 +84,7 @@ void *vm_phys_alloc_page(void)
     }
 }
 
-void vm_phys_free_page(void *page)
-{
+void vm_phys_free_page(void *page) {
     struct pmm_block *block = (void *)((uintptr_t)page + hhdm_request.response->offset);
     block->next = head;
     head = block;

@@ -8,5 +8,4 @@ void vm_slab_init(void);
 void *vm_phys_alloc_page(void);
 void vm_phys_free_page(void *page);
 
-
 #endif /* _VM_PMM_H */

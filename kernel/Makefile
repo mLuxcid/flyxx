@@ -8,7 +8,7 @@ override CC := cc
 override LD := ld
 
 # user-overridable flags
-override CFLAGS := -O2 -g -pipe
+override CFLAGS := -O3 -g -pipe
 override LDFLAGS :=
 override CPPFLAGS :=
 

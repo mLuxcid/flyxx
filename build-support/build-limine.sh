@@ -2,12 +2,13 @@
 
 set -xe
 
-[ -d "limine" ] && exit
+if [ -d "limine" ] && [ "x$1" != "xrebuild" ]; then
+    exit
+fi
+rm -rf limine/
 git clone https://github.com/limine-bootloader/limine
 
 cd limine
-
-[ -d "bin" ] && exit
 
 ./bootstrap
 ./configure --enable-uefi-x86-64 --enable-bios-cd --enable-uefi-ia32 \

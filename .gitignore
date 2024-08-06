@@ -2,4 +2,4 @@
 **/bin
 **/obj
 **/compile_flags.txt
-/limine
+limine/

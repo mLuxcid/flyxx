@@ -29,4 +29,6 @@ void _start() {
     gdt_init();
     idt_init();
     vm_phys_init();
+
+    halt();
 }

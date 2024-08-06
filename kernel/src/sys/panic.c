@@ -1,12 +1,12 @@
-#include "sys/cpu.h"
+#include <sys/cpu.h>
 #include <stdarg.h>
 #include <sys/panic.h>
 #include <lib/printf.h>
+#include <stdnoreturn.h>
 
 // TODO: locking ahhh
 
-_Noreturn void panic(struct cpu_context *context, const char *restrict format, ...)
-{
+noreturn void panic(struct cpu_context *context, const char *restrict format, ...) {
     asm ("cli");
     printf("**** KERNEL PANIC ****\n");
 

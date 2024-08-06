@@ -31,3 +31,7 @@ iso: kernel deps
 clean:
 	$(MAKE) -C kernel clean
 	rm -rf *.iso
+
+.PHONY: regenerate-deps
+regenerate-deps:
+	./build-support/build-limine.sh rebuild

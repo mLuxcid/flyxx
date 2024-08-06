@@ -47,6 +47,10 @@ struct tss {
     uint32_t iopb;
 } __attribute__((packed));
 
+struct cpu_local {
+    struct tss *tss;
+};
+
 _Noreturn void halt(void);
 
 #endif /* _SYS_CPU_H */
