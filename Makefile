@@ -7,7 +7,7 @@ override QEMUFLAGS := \
 	-cdrom flyxx.iso
 
 .PHONY: all
-all: kernel
+all: kernel iso
 
 limine:
 	build-support/build-limine.sh
