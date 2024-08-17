@@ -1,0 +1,7 @@
+/src/limine.h
+/src/cc-runtime
+/freestanding-headers
+/bin
+/obj
+/compile_flags.txt
+/printf
